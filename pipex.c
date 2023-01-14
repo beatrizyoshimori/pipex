@@ -6,76 +6,24 @@
 /*   By: byoshimo <byoshimo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/28 19:17:05 by byoshimo          #+#    #+#             */
-/*   Updated: 2023/01/12 19:34:37 by byoshimo         ###   ########.fr       */
+/*   Updated: 2023/01/13 21:54:45 by byoshimo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <stdio.h>
-#include <unistd.h>
-#include <sys/wait.h>
-#include <string.h>
-#include <stdlib.h>
-#include <fcntl.h>
-#include "libft/libft.h"
-
-void	free_split(char **str)
-{
-	int	i;
-
-	i = 0;
-	while (str[i])
-	{
-		free(str[i]);
-		i++;
-	}
-	free(str);
-}
-
-char	**get_paths(char *envp[])
-{
-	char	*tmp;
-	char	*tmp2;
-	char	**paths;
-
-	while (envp)
-	{
-		if (ft_strnstr(*envp, "PATH=", 5))
-			break;
-		envp++;
-	}
-	tmp = ft_strdup(*envp);
-	tmp2 = ft_strtrim(tmp, "PATH=");
-	paths = ft_split(tmp2, ':');
-	free(tmp);
-	free(tmp2);
-	return (paths);
-}
+#include "pipex.h"
 
 void	first_cmd(char *argv[], char **paths, int fd[])
 {
-	int		i;
 	int		fd_infile;
 	char	**str;
-	char	*tmp;
 	char	*pathname;
 
-	str = ft_split(argv[2], ' ');
-	i = 0;
-	while(str[i])
+	if (access(argv[2], F_OK) == 0)
+		pathname = ft_strdup(argv[2]);
+	else
 	{
-		printf("%s\n", str[i]);
-		i++;
-	}
-	i = 0;
-	while(paths[i])
-	{
-		tmp = ft_strjoin(paths[i], "/");
-		pathname = ft_strjoin(tmp, str[0]);
-		free(tmp);
-		if (access(pathname, F_OK) == 0)
-			break ;
-		free(pathname);
-		i++;
+		str = get_commands(argv[2]);
+		pathname = get_pathname(paths, str);
 	}
 	fd_infile = open(argv[1], O_RDONLY);
 	if (fd_infile == -1)
@@ -88,30 +36,26 @@ void	first_cmd(char *argv[], char **paths, int fd[])
 	dup2(fd[1], 1);
 	close(fd[0]);
 	close(fd[1]);
-	execve(pathname, str, NULL);
-	//free(pathname);
-	//free_split(str);
+	close(fd_infile);
+	if (execve(pathname, str, NULL) == -1)
+	{
+		free(pathname);
+		free_split(str);
+	}
 }
 
 void	second_cmd(char *argv[], char **paths, int fd[])
 {
-	int		i;
 	int		fd_outfile;
 	char	**str;
-	char	*tmp;
 	char	*pathname;
 
-	str = ft_split(argv[3], ' ');
-	i = 0;
-	while(paths[i])
+	if (access(argv[3], F_OK) == 0)
+		pathname = ft_strdup(argv[3]);
+	else
 	{
-		tmp = ft_strjoin(paths[i], "/");
-		pathname = ft_strjoin(tmp, str[0]);
-		free(tmp);
-		if (access(pathname, F_OK | X_OK) == 0)
-			break ;
-		free(pathname);
-		i++;
+		str = get_commands(argv[3]);
+		pathname = get_pathname(paths, str);
 	}
 	fd_outfile = open(argv[4], O_WRONLY | O_TRUNC | O_CREAT, 0777);
 	if (fd_outfile == -1)
@@ -124,9 +68,13 @@ void	second_cmd(char *argv[], char **paths, int fd[])
 	dup2(fd_outfile, 1);
 	close(fd[0]);
 	close(fd[1]);
+	close(fd_outfile);
 	execve(pathname, str, NULL);
-	//free(pathname);
-	//free_split(str);
+	if (execve(pathname, str, NULL) == -1)
+	{
+		free(pathname);
+		free_split(str);
+	}
 }
 
 int	main(int argc, char *argv[], char *envp[])
@@ -143,7 +91,13 @@ int	main(int argc, char *argv[], char *envp[])
 	if (pid < 0)
 		return (1);
 	else if (pid == 0)
+	{
 		first_cmd(argv, paths, fd);
+		free_split(paths);
+		close(fd[0]);
+		close(fd[1]);
+		exit(1);
+	}
 	pid2 = fork();
 	if (pid2 < 0)
 		return (1);
