@@ -6,7 +6,7 @@
 /*   By: byoshimo <byoshimo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/13 19:50:20 by byoshimo          #+#    #+#             */
-/*   Updated: 2023/01/13 19:52:09 by byoshimo         ###   ########.fr       */
+/*   Updated: 2023/01/14 16:13:32 by byoshimo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@ static void	delete_single_quotes(char **split_str)
 {
 	int		i;
 	char	*tmp;
-	
+
 	i = 0;
 	while (split_str[i])
 	{
@@ -40,25 +40,18 @@ char	**get_commands(char *str)
 
 	tmp = ft_strdup(str);
 	i = 0;
-	while (tmp[i])
-	{
-		if (tmp[i] == ' ')
-			tmp[i] = '\t';
-		i++;
-	}
-	i = 0;
 	if (ft_strchr(str, '\'') && ft_strchr(str, '\'') != ft_strrchr(str, '\''))
 	{
 		while (tmp[i] != '\'')
-			i++;
-		while (tmp[i])
 		{
-			if (tmp[i] == '\t')
-				tmp[i] = ' ';
+			if (tmp[i] == ' ')
+				tmp[i] = '\t';
 			i++;
 		}
+		split_str = ft_split(tmp, '\t');
 	}
-	split_str = ft_split(tmp, '\t');
+	else
+		split_str = ft_split(tmp, ' ');
 	delete_single_quotes(split_str);
 	free(tmp);
 	return (split_str);
