@@ -6,7 +6,7 @@
 /*   By: byoshimo <byoshimo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/13 19:49:17 by byoshimo          #+#    #+#             */
-/*   Updated: 2023/01/14 15:18:11 by byoshimo         ###   ########.fr       */
+/*   Updated: 2023/01/16 21:50:05 by byoshimo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,13 +23,15 @@ char	*get_pathname(char **paths, char **str)
 	{
 		tmp = ft_strjoin(paths[i], "/");
 		pathname = ft_strjoin(tmp, str[0]);
-		free(tmp);
+		if (tmp)
+			free(tmp);
 		if (access(pathname, F_OK) == 0)
-			break ;
-		free(pathname);
+			return (pathname);
+		if (pathname)
+			free(pathname);
 		i++;
 	}
-	return (pathname);
+	return (NULL);
 }
 
 char	**get_paths(char *envp[])
