@@ -6,7 +6,7 @@
 /*   By: byoshimo <byoshimo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/13 19:50:49 by byoshimo          #+#    #+#             */
-/*   Updated: 2023/01/16 19:42:00 by byoshimo         ###   ########.fr       */
+/*   Updated: 2023/01/17 22:03:54 by byoshimo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,13 +21,14 @@
 # include <fcntl.h>
 # include "libft/libft.h"
 
-void	first_cmd(char *argv[], char **paths, int fd[]);
-void	second_cmd(char *argv[], char **paths, int fd[]);
+void	first_cmd(char *argv[], char **paths, int fd[], char *envp[]);
+void	second_cmd(char *argv[], char **paths, int fd[], char *envp[]);
 char	**get_commands(char *str);
 char	*get_pathname(char **paths, char **str);
 char	**get_paths(char *envp[]);
 void	free_split(char **str);
 void	invalid_pathname(char **paths, char **str);
-void	invalid_fd(char *argv, char *pathname, char **str);
+void	invalid_fd(char *argv, char *pathname, char **paths, char **str);
+void	close_pipe_free_paths(int fd[], char **paths);
 
 #endif
