@@ -6,7 +6,7 @@
 /*   By: byoshimo <byoshimo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/28 19:17:05 by byoshimo          #+#    #+#             */
-/*   Updated: 2023/01/17 22:04:08 by byoshimo         ###   ########.fr       */
+/*   Updated: 2023/01/22 17:03:06 by byoshimo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,12 @@ void	first_cmd(char *argv[], char **paths, int fd[], char *envp[])
 	close(fd[1]);
 	close(fd_infile);
 	if (execve(pathname, str, envp) == -1)
+	{
 		free_split(str);
+		free_split(paths);
+		free(pathname);
+		exit(1);
+	}
 }
 
 void	second_cmd(char *argv[], char **paths, int fd[], char *envp[])
@@ -53,13 +58,19 @@ void	second_cmd(char *argv[], char **paths, int fd[], char *envp[])
 	fd_outfile = open(argv[4], O_WRONLY | O_TRUNC | O_CREAT, 0777);
 	if (fd_outfile == -1)
 		invalid_fd(argv[4], pathname, paths, str);
+	printf("%d\n%d\n", fd[0], fd_outfile);
 	dup2(fd[0], 0);
 	dup2(fd_outfile, 1);
 	close(fd[0]);
 	close(fd[1]);
 	close(fd_outfile);
 	if (execve(pathname, str, envp) == -1)
+	{
 		free_split(str);
+		free_split(paths);
+		free(pathname);
+		exit(1);
+	}
 }
 
 int	main(int argc, char *argv[], char *envp[])
@@ -75,18 +86,17 @@ int	main(int argc, char *argv[], char *envp[])
 	if (pid[0] < 0)
 		return (close_pipe_free_paths(fd, paths), 1);
 	else if (pid[0] == 0)
-	{
 		first_cmd(argv, paths, fd, envp);
-		close_pipe_free_paths(fd, paths);
-		exit(1);
-	}
 	pid[1] = fork();
 	if (pid[1] < 0)
 		return (close_pipe_free_paths(fd, paths), 1);
 	if (pid[1] == 0)
 		second_cmd(argv, paths, fd, envp);
 	close_pipe_free_paths(fd, paths);
-	waitpid(pid[0], NULL, 0);
-	waitpid(pid[1], NULL, 0);
-	return (0);
+	int status;
+	waitpid(pid[0], &status, 0);
+	waitpid(pid[1], &status, 0);
+	int exit_status = WEXITSTATUS(status);  
+	//exit(exit_status);
+	return (exit_status);
 }

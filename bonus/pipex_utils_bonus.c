@@ -1,16 +1,16 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   pipex_utils.c                                      :+:      :+:    :+:   */
+/*   pipex_utils_bonus.c                                :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: byoshimo <byoshimo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/13 19:55:13 by byoshimo          #+#    #+#             */
-/*   Updated: 2023/01/19 18:08:37 by byoshimo         ###   ########.fr       */
+/*   Updated: 2023/01/22 16:42:07 by byoshimo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "pipex.h"
+#include "pipex_bonus.h"
 
 void	free_split(char **str)
 {
@@ -44,9 +44,19 @@ void	invalid_fd(char *argv, char *pathname, char **paths, char **str)
 	exit(1);
 }
 
-void	close_pipe_free_paths(int fd[], char **paths)
+void	close_pipe_free_paths(int fd[2][2], char **paths)
 {
-	close(fd[0]);
-	close(fd[1]);
+	close(fd[0][0]);
+	close(fd[0][1]);
+	close(fd[1][0]);
+	close(fd[1][1]);
 	free_split(paths);
+}
+
+void	close_pipes(int fd[2][2])
+{
+	close(fd[0][0]);
+	close(fd[0][1]);
+	close(fd[1][0]);
+	close(fd[1][1]);
 }
