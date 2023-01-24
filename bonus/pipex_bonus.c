@@ -44,7 +44,7 @@ void	first_cmd(char *argv[], char **paths, int fd[2][2], char *envp[])
 	}
 }
 
-void	second_cmd(char *argv[], int argc, char **paths, int fd[2][2], char *envp[])
+void	last_cmd(char *argv[], int argc, char **paths, int fd[2][2], char *envp[])
 {
 	int		i;
 	int		fd_outfile;
@@ -78,7 +78,7 @@ void	second_cmd(char *argv[], int argc, char **paths, int fd[2][2], char *envp[]
 	}
 }
 
-void	middle_cmd1(char *argv, char **paths, int fd[2][2], char *envp[])
+void	middle_cmd2(char *argv, char **paths, int fd[2][2], char *envp[])
 {
 	char	**str;
 	char	*pathname;
@@ -105,7 +105,7 @@ void	middle_cmd1(char *argv, char **paths, int fd[2][2], char *envp[])
 	}
 }
 
-void	middle_cmd2(char *argv, char **paths, int fd[2][2], char *envp[])
+void	middle_cmd1(char *argv, char **paths, int fd[2][2], char *envp[])
 {
 	char	**str;
 	char	*pathname;
@@ -163,9 +163,23 @@ int	main(int argc, char *argv[], char *envp[])
 			else if (pid[i] == 0)
 			{
 				if (i % 2 == 0)
-					middle_cmd1(argv[i + 2], paths, fd, envp);
-				else
 					middle_cmd2(argv[i + 2], paths, fd, envp);
+				else
+					middle_cmd1(argv[i + 2], paths, fd, envp);
+			}
+			if (i % 2 == 0)
+			{
+				close(fd[1][0]);
+				close(fd[1][1]);
+				if (pipe(fd[1]) == -1)
+					return (free_split(paths), 1);
+			}
+			else
+			{
+				close(fd[0][0]);
+				close(fd[0][1]);
+				if (pipe(fd[0]) == -1)
+					return (free_split(paths), 1);
 			}
 		}
 		else
@@ -174,12 +188,11 @@ int	main(int argc, char *argv[], char *envp[])
 			if (pid[i] < 0)
 				return (close_pipe_free_paths(fd, paths), 1);
 			else if (pid[i] == 0)
-				second_cmd(argv, argc, paths, fd, envp);
+				last_cmd(argv, argc, paths, fd, envp);
 		}
 		i++;
 	}
-	close_pipes(fd);
-	free_split(paths);
+	close_pipe_free_paths(fd, paths);
 	int status;
 	i = 0;
 	while (i < argc - 3)

@@ -22,7 +22,7 @@
 # include "../libft/libft.h"
 
 void	first_cmd(char *argv[], char **paths, int fd[2][2], char *envp[]);
-void	second_cmd(char *argv[], int argc, char **paths, int fd[2][2], char *envp[]);
+void	last_cmd(char *argv[], int argc, char **paths, int fd[2][2], char *envp[]);
 char	**get_commands(char *str);
 char	*get_pathname(char **paths, char **str);
 char	**get_paths(char *envp[]);
