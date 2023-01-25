@@ -6,13 +6,13 @@
 /*   By: byoshimo <byoshimo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/28 19:17:05 by byoshimo          #+#    #+#             */
-/*   Updated: 2023/01/22 17:02:34 by byoshimo         ###   ########.fr       */
+/*   Updated: 2023/01/24 21:56:27 by byoshimo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex_bonus.h"
 
-void	first_cmd(char *argv[], char **paths, int fd[2][2], char *envp[])
+void	first_cmd(char *argv[], char *envp[], t_data *data)
 {
 	int		fd_infile;
 	char	**str;
@@ -22,29 +22,21 @@ void	first_cmd(char *argv[], char **paths, int fd[2][2], char *envp[])
 	if (access(argv[2], F_OK) == 0)
 		pathname = ft_strdup(argv[2]);
 	else
-		pathname = get_pathname(paths, str);
+		pathname = get_pathname(data->paths, str);
 	if (!pathname)
-		invalid_pathname(paths, str);
+		invalid_pathname(data->paths, str);
 	fd_infile = open(argv[1], O_RDONLY);
 	if (fd_infile == -1)
-		invalid_fd(argv[1], pathname, paths, str);
+		invalid_fd(argv[1], pathname, data->paths, str);
 	dup2(fd_infile, 0);
-	dup2(fd[0][1], 1);
-	close(fd[0][0]);
-	close(fd[0][1]);
-	close(fd[1][0]);
-	close(fd[1][1]);
+	dup2(data->fd[0][1], 1);
+	close_pipes(data->fd);
 	close(fd_infile);
 	if (execve(pathname, str, envp) == -1)
-	{
-		free_split(str);
-		free_split(paths);
-		free(pathname);
-		exit(1);
-	}
+		execve_error(data, str, pathname);
 }
 
-void	last_cmd(char *argv[], int argc, char **paths, int fd[2][2], char *envp[])
+void	last_cmd(char *argv[], int argc, char *envp[], t_data *data)
 {
 	int		i;
 	int		fd_outfile;
@@ -55,30 +47,22 @@ void	last_cmd(char *argv[], int argc, char **paths, int fd[2][2], char *envp[])
 	if (access(argv[argc - 2], F_OK) == 0)
 		pathname = ft_strdup(argv[argc - 2]);
 	else
-		pathname = get_pathname(paths, str);
+		pathname = get_pathname(data->paths, str);
 	if (!pathname)
-		invalid_pathname(paths, str);
+		invalid_pathname(data->paths, str);
 	fd_outfile = open(argv[argc - 1], O_WRONLY | O_TRUNC | O_CREAT, 0777);
 	if (fd_outfile == -1)
-		invalid_fd(argv[argc - 1], pathname, paths, str);
+		invalid_fd(argv[argc - 1], pathname, data->paths, str);
 	i = (argc - 1) % 2;
-	dup2(fd[i][0], 0);
+	dup2(data->fd[i][0], 0);
 	dup2(fd_outfile, 1);
-	close(fd[i][0]);
-	close(fd[i][1]);
-	close(fd[1 - i][0]);
-	close(fd[1 - i][1]);
+	close_pipes(data->fd);
 	close(fd_outfile);
 	if (execve(pathname, str, envp) == -1)
-	{
-		free_split(str);
-		free_split(paths);
-		free(pathname);
-		exit(1);
-	}
+		execve_error(data, str, pathname);
 }
 
-void	middle_cmd2(char *argv, char **paths, int fd[2][2], char *envp[])
+void	middle_cmd(char *argv, char *envp[], t_data *data, int i)
 {
 	char	**str;
 	char	*pathname;
@@ -87,119 +71,70 @@ void	middle_cmd2(char *argv, char **paths, int fd[2][2], char *envp[])
 	if (access(argv, F_OK) == 0)
 		pathname = ft_strdup(argv);
 	else
-		pathname = get_pathname(paths, str);
+		pathname = get_pathname(data->paths, str);
 	if (!pathname)
-		invalid_pathname(paths, str);
-	dup2(fd[1][0], 0);
-	dup2(fd[0][1], 1);
-	close(fd[0][0]);
-	close(fd[0][1]);
-	close(fd[1][0]);
-	close(fd[1][1]);
-	if (execve(pathname, str, envp) == -1)
+		invalid_pathname(data->paths, str);
+	if (i % 2 == 0)
 	{
-		free_split(str);
-		free_split(paths);
-		free(pathname);
-		exit(1);
+		dup2(data->fd[1][0], 0);
+		dup2(data->fd[0][1], 1);
 	}
-}
-
-void	middle_cmd1(char *argv, char **paths, int fd[2][2], char *envp[])
-{
-	char	**str;
-	char	*pathname;
-
-	str = get_commands(argv);
-	if (access(argv, F_OK) == 0)
-		pathname = ft_strdup(argv);
 	else
-		pathname = get_pathname(paths, str);
-	if (!pathname)
-		invalid_pathname(paths, str);
-	dup2(fd[0][0], 0);
-	dup2(fd[1][1], 1);
-	close(fd[0][0]);
-	close(fd[0][1]);
-	close(fd[1][0]);
-	close(fd[1][1]);
-	if (execve(pathname, str, envp) == -1)
 	{
-		free_split(str);
-		free_split(paths);
-		free(pathname);
-		exit(1);
+		dup2(data->fd[0][0], 0);
+		dup2(data->fd[1][1], 1);
 	}
+	close_pipes(data->fd);
+	if (execve(pathname, str, envp) == -1)
+		execve_error(data, str, pathname);
 }
 
 int	main(int argc, char *argv[], char *envp[])
 {
 	int		i;
-	int		fd[2][2];
-	int		pid[argc - 3];
-	char	**paths;
+	int		exit_status;
+	t_data	*data;
 
-	paths = get_paths(envp);
-	if (pipe(fd[0]) == -1)
-		return (free_split(paths), 1);
-	if (pipe(fd[1]) == -1)
-		return (free_split(paths), 1);
+	get_data(&data, argc, envp);
+	start_pipes(data);
 	i = 0;
 	while (i < argc - 3)
 	{
 		if (i == 0)
 		{
-			pid[i] = fork();
-			if (pid[i] < 0)
-				return (close_pipe_free_paths(fd, paths), 1);
-			else if (pid[i] == 0)
-				first_cmd(argv, paths, fd, envp);
+			data->pid[i] = fork();
+			if (data->pid[i] < 0)
+				return (close_pipes_free_all(data), 1);
+			else if (data->pid[i] == 0)
+				first_cmd(argv, envp, data);
 		}
 		else if (i < argc - 4)
 		{
-			pid[i] = fork();
-			if (pid[i] < 0)
-				return (close_pipe_free_paths(fd, paths), 1);
-			else if (pid[i] == 0)
-			{
-				if (i % 2 == 0)
-					middle_cmd2(argv[i + 2], paths, fd, envp);
-				else
-					middle_cmd1(argv[i + 2], paths, fd, envp);
-			}
+			data->pid[i] = fork();
+			if (data->pid[i] < 0)
+				return (close_pipes_free_all(data), 1);
+			else if (data->pid[i] == 0)
+				middle_cmd(argv[i + 2], envp, data, i);
 			if (i % 2 == 0)
-			{
-				close(fd[1][0]);
-				close(fd[1][1]);
-				if (pipe(fd[1]) == -1)
-					return (free_split(paths), 1);
-			}
+				recycle_pipe(data, 1);
 			else
-			{
-				close(fd[0][0]);
-				close(fd[0][1]);
-				if (pipe(fd[0]) == -1)
-					return (free_split(paths), 1);
-			}
+				recycle_pipe(data, 0);
 		}
 		else
 		{
-			pid[i] = fork();
-			if (pid[i] < 0)
-				return (close_pipe_free_paths(fd, paths), 1);
-			else if (pid[i] == 0)
-				last_cmd(argv, argc, paths, fd, envp);
+			data->pid[i] = fork();
+			if (data->pid[i] < 0)
+				return (close_pipes_free_all(data), 1);
+			else if (data->pid[i] == 0)
+				last_cmd(argv, argc, envp, data);
 		}
 		i++;
 	}
-	close_pipe_free_paths(fd, paths);
-	int status;
+	close_pipes(data->fd);
 	i = 0;
 	while (i < argc - 3)
-	{
-		waitpid(pid[i], &status, 0);
-		i++;
-	}
-	int exit_status = WEXITSTATUS(status);  
+		waitpid(data->pid[i++], &data->status, 0);
+	exit_status = WEXITSTATUS(data->status);
+	free_all(data);
 	return (exit_status);
 }
