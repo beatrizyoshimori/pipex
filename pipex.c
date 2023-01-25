@@ -6,7 +6,7 @@
 /*   By: byoshimo <byoshimo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/28 19:17:05 by byoshimo          #+#    #+#             */
-/*   Updated: 2023/01/22 17:03:06 by byoshimo         ###   ########.fr       */
+/*   Updated: 2023/01/25 15:13:14 by byoshimo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,7 +58,6 @@ void	second_cmd(char *argv[], char **paths, int fd[], char *envp[])
 	fd_outfile = open(argv[4], O_WRONLY | O_TRUNC | O_CREAT, 0777);
 	if (fd_outfile == -1)
 		invalid_fd(argv[4], pathname, paths, str);
-	printf("%d\n%d\n", fd[0], fd_outfile);
 	dup2(fd[0], 0);
 	dup2(fd_outfile, 1);
 	close(fd[0]);
@@ -77,6 +76,8 @@ int	main(int argc, char *argv[], char *envp[])
 {
 	int		fd[2];
 	int		pid[2];
+	int		status;
+	int		exit_status;
 	char	**paths;
 
 	paths = get_paths(envp);
@@ -93,10 +94,8 @@ int	main(int argc, char *argv[], char *envp[])
 	if (pid[1] == 0)
 		second_cmd(argv, paths, fd, envp);
 	close_pipe_free_paths(fd, paths);
-	int status;
 	waitpid(pid[0], &status, 0);
 	waitpid(pid[1], &status, 0);
-	int exit_status = WEXITSTATUS(status);  
-	//exit(exit_status);
+	exit_status = WEXITSTATUS(status);
 	return (exit_status);
 }
