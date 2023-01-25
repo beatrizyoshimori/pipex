@@ -1,30 +1,16 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   pipex_utils.c                                      :+:      :+:    :+:   */
+/*   error.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: byoshimo <byoshimo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/01/13 19:55:13 by byoshimo          #+#    #+#             */
-/*   Updated: 2023/01/19 18:08:37 by byoshimo         ###   ########.fr       */
+/*   Created: 2023/01/25 14:52:51 by byoshimo          #+#    #+#             */
+/*   Updated: 2023/01/25 15:54:49 by byoshimo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "pipex.h"
-
-void	free_split(char **str)
-{
-	int	i;
-
-	i = 0;
-	while (str[i])
-	{
-		free(str[i]);
-		i++;
-	}
-	free(str);
-	str = NULL;
-}
+#include "pipex_bonus.h"
 
 void	invalid_pathname(char **paths, char **str)
 {
@@ -44,9 +30,19 @@ void	invalid_fd(char *argv, char *pathname, char **paths, char **str)
 	exit(1);
 }
 
-void	close_pipe_free_paths(int fd[], char **paths)
+void	execve_error(t_data *data)
 {
-	close(fd[0]);
-	close(fd[1]);
-	free_split(paths);
+	free_split(data->str);
+	free_split(data->paths);
+	free(data->pid);
+	free(data->pathname);
+	free(data);
+	exit(1);
+}
+
+void	pipe_error(t_data *data)
+{
+	close_pipes(data->fd);
+	free_all(data);
+	exit(1);
 }
