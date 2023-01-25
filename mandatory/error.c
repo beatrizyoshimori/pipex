@@ -6,7 +6,7 @@
 /*   By: byoshimo <byoshimo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/25 19:00:45 by byoshimo          #+#    #+#             */
-/*   Updated: 2023/01/25 19:02:11 by byoshimo         ###   ########.fr       */
+/*   Updated: 2023/01/25 20:04:12 by byoshimo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,10 +30,10 @@ void	invalid_fd(char *argv, char *pathname, char **paths, char **str)
 	exit(1);
 }
 
-void    execve_error(char *pathname, char **paths, char **str)
+void	execve_error(char *pathname, char **paths, char **str)
 {
-    free_split(str);
-    free_split(paths);
-    free(pathname);
-    exit(1);
+	free_split(str);
+	free_split(paths);
+	free(pathname);
+	exit(1);
 }
