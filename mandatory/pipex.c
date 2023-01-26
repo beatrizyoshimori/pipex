@@ -6,7 +6,7 @@
 /*   By: byoshimo <byoshimo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/28 19:17:05 by byoshimo          #+#    #+#             */
-/*   Updated: 2023/01/25 19:10:17 by byoshimo         ###   ########.fr       */
+/*   Updated: 2023/01/26 19:48:01 by byoshimo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,15 +72,15 @@ int	main(int argc, char *argv[], char *envp[])
 
 	paths = get_paths(envp);
 	if (argc != 5 || pipe(fd) == -1)
-		return (free_split(paths), 1);
+		pipe_error(paths);
 	pid[0] = fork();
 	if (pid[0] < 0)
-		return (close_pipe_free_paths(fd, paths), 1);
+		fork_error(fd, paths);
 	else if (pid[0] == 0)
 		first_cmd(argv, paths, fd, envp);
 	pid[1] = fork();
 	if (pid[1] < 0)
-		return (close_pipe_free_paths(fd, paths), 1);
+		fork_error(fd, paths);
 	if (pid[1] == 0)
 		second_cmd(argv, paths, fd, envp);
 	close_pipe_free_paths(fd, paths);

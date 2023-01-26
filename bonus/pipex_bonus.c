@@ -6,7 +6,7 @@
 /*   By: byoshimo <byoshimo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/28 19:17:05 by byoshimo          #+#    #+#             */
-/*   Updated: 2023/01/25 16:33:14 by byoshimo         ###   ########.fr       */
+/*   Updated: 2023/01/26 18:34:54 by byoshimo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,7 +87,7 @@ int	main(int argc, char *argv[], char *envp[])
 	{
 		data->pid[i] = fork();
 		if (data->pid[i] < 0)
-			pipe_error(data);
+			fork_error(data);
 		else if (data->pid[i] == 0)
 			child_process(argv, envp, data, i);
 		if (i < argc - 4)

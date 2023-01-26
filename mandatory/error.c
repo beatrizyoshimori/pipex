@@ -6,7 +6,7 @@
 /*   By: byoshimo <byoshimo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/25 19:00:45 by byoshimo          #+#    #+#             */
-/*   Updated: 2023/01/25 20:04:12 by byoshimo         ###   ########.fr       */
+/*   Updated: 2023/01/26 19:21:26 by byoshimo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,5 +35,19 @@ void	execve_error(char *pathname, char **paths, char **str)
 	free_split(str);
 	free_split(paths);
 	free(pathname);
+	exit(1);
+}
+
+void	fork_error(int fd[2], char **paths)
+{
+	close(fd[0]);
+	close(fd[1]);
+	free_split(paths);
+	exit(1);
+}
+
+void	pipe_error(char **paths)
+{
+	free_split(paths);
 	exit(1);
 }

@@ -6,7 +6,7 @@
 /*   By: byoshimo <byoshimo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/13 19:50:49 by byoshimo          #+#    #+#             */
-/*   Updated: 2023/01/25 20:04:36 by byoshimo         ###   ########.fr       */
+/*   Updated: 2023/01/26 19:43:38 by byoshimo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,5 +31,7 @@ void	invalid_pathname(char **paths, char **str);
 void	invalid_fd(char *argv, char *pathname, char **paths, char **str);
 void	close_pipe_free_paths(int fd[], char **paths);
 void	execve_error(char *pathname, char **paths, char **str);
+void	fork_error(int fd[2], char **paths);
+void	pipe_error(char **paths);
 
 #endif

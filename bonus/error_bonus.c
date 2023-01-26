@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   error.c                                            :+:      :+:    :+:   */
+/*   error_bonus.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: byoshimo <byoshimo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/25 14:52:51 by byoshimo          #+#    #+#             */
-/*   Updated: 2023/01/25 15:54:49 by byoshimo         ###   ########.fr       */
+/*   Updated: 2023/01/26 18:35:02 by byoshimo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,7 @@ void	execve_error(t_data *data)
 	exit(1);
 }
 
-void	pipe_error(t_data *data)
+void	fork_error(t_data *data)
 {
 	close_pipes(data->fd);
 	free_all(data);
