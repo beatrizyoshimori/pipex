@@ -65,7 +65,7 @@ void	second_cmd(char *argv[], char **paths, int fd[], char *envp[])
 int	main(int argc, char *argv[], char *envp[])
 {
 	int		fd[2];
-	int		pid[2];
+	pid_t	pid[2];
 	int		status;
 	int		exit_status;
 	char	**paths;

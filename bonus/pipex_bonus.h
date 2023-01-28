@@ -24,7 +24,7 @@
 typedef struct s_data
 {
 	int		fd[2][2];
-	int		*pid;
+	pid_t	*pid;
 	char	**paths;
 	int		status;
 	int		exit_status;
