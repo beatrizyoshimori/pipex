@@ -6,7 +6,7 @@
 /*   By: byoshimo <byoshimo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/28 19:17:05 by byoshimo          #+#    #+#             */
-/*   Updated: 2023/01/26 19:48:01 by byoshimo         ###   ########.fr       */
+/*   Updated: 2023/01/28 17:03:20 by byoshimo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,11 @@ void	first_cmd(char *argv[], char **paths, int fd[], char *envp[])
 	char	**str;
 	char	*pathname;
 
+	if (ft_strlen(argv[2]) == 0)
+	{
+		free_split(paths);
+		exit(1);
+	}
 	str = get_commands(argv[2]);
 	if (access(argv[2], F_OK) == 0)
 		pathname = ft_strdup(argv[2]);
@@ -43,6 +48,11 @@ void	second_cmd(char *argv[], char **paths, int fd[], char *envp[])
 	char	**str;
 	char	*pathname;
 
+	if (ft_strlen(argv[3]) == 0)
+	{
+		free_split(paths);
+		exit(1);
+	}
 	str = get_commands(argv[3]);
 	if (access(argv[3], F_OK) == 0)
 		pathname = ft_strdup(argv[3]);
