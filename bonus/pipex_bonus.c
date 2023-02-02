@@ -6,7 +6,7 @@
 /*   By: byoshimo <byoshimo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/28 19:17:05 by byoshimo          #+#    #+#             */
-/*   Updated: 2023/01/26 18:34:54 by byoshimo         ###   ########.fr       */
+/*   Updated: 2023/02/01 19:03:52 by byoshimo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,6 +58,9 @@ void	middle_cmd(t_data *data, int i)
 void	child_process(char *argv[], char *envp[], t_data *data, int i)
 {
 	data->str = get_commands(argv[i + 2]);
+	int j = 0;
+	while (data->str[j])
+		printf("%s\n", data->str[j++]);
 	if (access(argv[i + 2], F_OK) == 0)
 		data->pathname = ft_strdup(argv[i + 2]);
 	else
