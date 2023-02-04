@@ -6,38 +6,30 @@
 /*   By: byoshimo <byoshimo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/25 14:52:51 by byoshimo          #+#    #+#             */
-/*   Updated: 2023/01/26 18:35:02 by byoshimo         ###   ########.fr       */
+/*   Updated: 2023/02/04 19:21:29 by byoshimo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex_bonus.h"
 
-void	invalid_pathname(char **paths, char **str)
+void	invalid_pathname(t_data *data)
 {
 	perror("command not found");
-	free_split(paths);
-	free_split(str);
+	free_all(data);
 	exit(127);
 }
 
-void	invalid_fd(char *argv, char *pathname, char **paths, char **str)
+void	invalid_fd(char *argv, t_data *data)
 {
 	perror(argv);
-	if (pathname)
-		free(pathname);
-	free_split(str);
-	free_split(paths);
+	free_all(data);
 	exit(1);
 }
 
 void	execve_error(t_data *data)
 {
-	free_split(data->str);
-	free_split(data->paths);
-	free(data->pid);
-	free(data->pathname);
-	free(data);
-	exit(1);
+	free_all(data);
+	exit(126);
 }
 
 void	fork_error(t_data *data)

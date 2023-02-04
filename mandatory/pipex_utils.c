@@ -6,7 +6,7 @@
 /*   By: byoshimo <byoshimo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/13 19:55:13 by byoshimo          #+#    #+#             */
-/*   Updated: 2023/01/25 19:01:23 by byoshimo         ###   ########.fr       */
+/*   Updated: 2023/02/04 16:28:47 by byoshimo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,4 +31,14 @@ void	close_pipe_free_paths(int fd[], char **paths)
 	close(fd[0]);
 	close(fd[1]);
 	free_split(paths);
+}
+
+void	check_empty_string(char *argv, char **paths, int fd)
+{
+	if (ft_strlen(argv) == 0)
+	{
+		free_split(paths);
+		close(fd);
+		exit(1);
+	}
 }

@@ -6,7 +6,7 @@
 /*   By: byoshimo <byoshimo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/28 19:17:05 by byoshimo          #+#    #+#             */
-/*   Updated: 2023/02/01 19:03:52 by byoshimo         ###   ########.fr       */
+/*   Updated: 2023/02/04 19:23:42 by byoshimo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@ void	first_cmd(char *argv[], t_data *data)
 
 	fd_infile = open(argv[1], O_RDONLY);
 	if (fd_infile == -1)
-		invalid_fd(argv[1], data->pathname, data->paths, data->str);
+		invalid_fd(argv[1], data);
 	dup2(fd_infile, 0);
 	dup2(data->fd[0][1], 1);
 	close_pipes(data->fd);
@@ -30,9 +30,9 @@ void	last_cmd(char *argv[], t_data *data, int i)
 	int		fd;
 	int		fd_outfile;
 
-	fd_outfile = open(argv[i + 3], O_WRONLY | O_TRUNC | O_CREAT, 0777);
+	fd_outfile = open(argv[i + 3], O_WRONLY | O_TRUNC | O_CREAT, 0644);
 	if (fd_outfile == -1)
-		invalid_fd(argv[i + 3], data->pathname, data->paths, data->str);
+		invalid_fd(argv[i + 3], data);
 	fd = (i + 3) % 2;
 	dup2(data->fd[fd][0], 0);
 	dup2(fd_outfile, 1);
@@ -57,16 +57,14 @@ void	middle_cmd(t_data *data, int i)
 
 void	child_process(char *argv[], char *envp[], t_data *data, int i)
 {
+	check_empty_string(argv, data, i);
 	data->str = get_commands(argv[i + 2]);
-	int j = 0;
-	while (data->str[j])
-		printf("%s\n", data->str[j++]);
 	if (access(argv[i + 2], F_OK) == 0)
 		data->pathname = ft_strdup(argv[i + 2]);
 	else
 		data->pathname = get_pathname(data->paths, data->str);
 	if (!data->pathname)
-		invalid_pathname(data->paths, data->str);
+		invalid_pathname(data);
 	if (i == 0)
 		first_cmd(argv, data);
 	else if (i < data->num_cmds - 1)

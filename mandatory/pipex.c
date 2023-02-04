@@ -6,7 +6,7 @@
 /*   By: byoshimo <byoshimo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/28 19:17:05 by byoshimo          #+#    #+#             */
-/*   Updated: 2023/01/28 17:03:20 by byoshimo         ###   ########.fr       */
+/*   Updated: 2023/02/04 17:10:51 by byoshimo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,11 +18,10 @@ void	first_cmd(char *argv[], char **paths, int fd[], char *envp[])
 	char	**str;
 	char	*pathname;
 
-	if (ft_strlen(argv[2]) == 0)
-	{
-		free_split(paths);
-		exit(1);
-	}
+	fd_infile = open(argv[1], O_RDONLY);
+	if (fd_infile == -1)
+		invalid_fd(argv[1], paths);
+	check_empty_string(argv[2], paths, fd_infile);
 	str = get_commands(argv[2]);
 	if (access(argv[2], F_OK) == 0)
 		pathname = ft_strdup(argv[2]);
@@ -30,9 +29,6 @@ void	first_cmd(char *argv[], char **paths, int fd[], char *envp[])
 		pathname = get_pathname(paths, str);
 	if (!pathname)
 		invalid_pathname(paths, str);
-	fd_infile = open(argv[1], O_RDONLY);
-	if (fd_infile == -1)
-		invalid_fd(argv[1], pathname, paths, str);
 	dup2(fd_infile, 0);
 	dup2(fd[1], 1);
 	close(fd[0]);
@@ -48,11 +44,10 @@ void	second_cmd(char *argv[], char **paths, int fd[], char *envp[])
 	char	**str;
 	char	*pathname;
 
-	if (ft_strlen(argv[3]) == 0)
-	{
-		free_split(paths);
-		exit(1);
-	}
+	fd_outfile = open(argv[4], O_WRONLY | O_TRUNC | O_CREAT, 0644);
+	if (fd_outfile == -1)
+		invalid_fd(argv[4], paths);
+	check_empty_string(argv[3], paths, fd_outfile);
 	str = get_commands(argv[3]);
 	if (access(argv[3], F_OK) == 0)
 		pathname = ft_strdup(argv[3]);
@@ -60,9 +55,6 @@ void	second_cmd(char *argv[], char **paths, int fd[], char *envp[])
 		pathname = get_pathname(paths, str);
 	if (!pathname)
 		invalid_pathname(paths, str);
-	fd_outfile = open(argv[4], O_WRONLY | O_TRUNC | O_CREAT, 0777);
-	if (fd_outfile == -1)
-		invalid_fd(argv[4], pathname, paths, str);
 	dup2(fd[0], 0);
 	dup2(fd_outfile, 1);
 	close(fd[0]);
