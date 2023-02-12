@@ -27,7 +27,6 @@ typedef struct s_data
 	pid_t	*pid;
 	char	**paths;
 	int		status;
-	int		exit_status;
 	int		num_cmds;
 	char	*pathname;
 	char	**command;
