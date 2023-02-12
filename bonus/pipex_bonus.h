@@ -31,8 +31,6 @@ typedef struct s_data
 	int		num_cmds;
 	char	*pathname;
 	char	**command;
-	int		fd_infile;
-	int		fd_outfile;
 }	t_data;
 
 void	first_cmd(char *argv[], t_data *data);
