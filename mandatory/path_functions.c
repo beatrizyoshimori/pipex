@@ -12,6 +12,16 @@
 
 #include "pipex.h"
 
+void	check_execution_permission(char *pathname)
+{
+	if (access(pathname, X_OK) == -1)
+	{
+		ft_putstr_fd("bash: ", 1);
+		perror(pathname);
+		exit(126);
+	}
+}
+
 char	*get_pathname(char **paths, char **str)
 {
 	int		i;
@@ -26,7 +36,10 @@ char	*get_pathname(char **paths, char **str)
 		if (tmp)
 			free(tmp);
 		if (access(pathname, F_OK) == 0)
+		{
+			check_execution_permission(pathname);
 			return (pathname);
+		}
 		if (pathname)
 			free(pathname);
 		i++;

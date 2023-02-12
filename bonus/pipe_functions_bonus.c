@@ -24,8 +24,9 @@ void	recycle_pipe(t_data *data, int i)
 	close(data->fd[fd][1]);
 	if (pipe(data->fd[fd]) == -1)
 	{
+		ft_putstr_fd("Pipe error.\n", 1);
 		free_all(data);
-		exit(127);
+		exit(1);
 	}
 }
 
@@ -33,13 +34,15 @@ void	start_pipes(t_data *data)
 {
 	if (pipe(data->fd[0]) == -1)
 	{
+		ft_putstr_fd("Pipe error.\n", 1);
 		free_all(data);
-		exit(127);
+		exit(1);
 	}
 	if (pipe(data->fd[1]) == -1)
 	{
+		ft_putstr_fd("Pipe error.\n", 1);
 		free_all(data);
-		exit(127);
+		exit(1);
 	}
 }
 

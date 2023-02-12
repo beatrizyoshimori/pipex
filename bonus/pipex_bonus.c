@@ -57,21 +57,24 @@ void	middle_cmd(t_data *data, int i)
 
 void	child_process(char *argv[], char *envp[], t_data *data, int i)
 {
-	check_empty_string(argv, data, i);
-	data->str = get_commands(argv[i + 2]);
+	check_file1_and_empty_string(argv, data, i);
+	data->command = get_commands(argv[i + 2]);
 	if (access(argv[i + 2], F_OK) == 0)
+	{
+		check_execution_permission(argv[i + 2]);
 		data->pathname = ft_strdup(argv[i + 2]);
+	}
 	else
-		data->pathname = get_pathname(data->paths, data->str);
+		data->pathname = get_pathname(data->paths, data->command);
 	if (!data->pathname)
-		invalid_pathname(data);
+		invalid_pathname(data, argv[i + 2]);
 	if (i == 0)
 		first_cmd(argv, data);
 	else if (i < data->num_cmds - 1)
 		middle_cmd(data, i);
 	else
 		last_cmd(argv, data, i);
-	if (execve(data->pathname, data->str, envp) == -1)
+	if (execve(data->pathname, data->command, envp) == -1)
 		execve_error(data);
 }
 

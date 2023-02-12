@@ -15,53 +15,59 @@
 void	first_cmd(char *argv[], char **paths, int fd[], char *envp[])
 {
 	int		fd_infile;
-	char	**str;
+	char	**command;
 	char	*pathname;
 
 	fd_infile = open(argv[1], O_RDONLY);
 	if (fd_infile == -1)
 		invalid_fd(argv[1], paths);
 	check_empty_string(argv[2], paths, fd_infile);
-	str = get_commands(argv[2]);
+	command = get_commands(argv[2]);
 	if (access(argv[2], F_OK) == 0)
+	{
+		check_execution_permission(argv[2]);
 		pathname = ft_strdup(argv[2]);
+	}
 	else
-		pathname = get_pathname(paths, str);
+		pathname = get_pathname(paths, command);
 	if (!pathname)
-		invalid_pathname(paths, str);
+		invalid_pathname(paths, command, argv[2]);
 	dup2(fd_infile, 0);
 	dup2(fd[1], 1);
 	close(fd[0]);
 	close(fd[1]);
 	close(fd_infile);
-	if (execve(pathname, str, envp) == -1)
-		execve_error(pathname, paths, str);
+	if (execve(pathname, command, envp) == -1)
+		execve_error(pathname, paths, command);
 }
 
 void	second_cmd(char *argv[], char **paths, int fd[], char *envp[])
 {
 	int		fd_outfile;
-	char	**str;
+	char	**command;
 	char	*pathname;
 
 	fd_outfile = open(argv[4], O_WRONLY | O_TRUNC | O_CREAT, 0644);
 	if (fd_outfile == -1)
 		invalid_fd(argv[4], paths);
 	check_empty_string(argv[3], paths, fd_outfile);
-	str = get_commands(argv[3]);
+	command = get_commands(argv[3]);
 	if (access(argv[3], F_OK) == 0)
+	{
+		check_execution_permission(argv[3]);
 		pathname = ft_strdup(argv[3]);
+	}
 	else
-		pathname = get_pathname(paths, str);
+		pathname = get_pathname(paths, command);
 	if (!pathname)
-		invalid_pathname(paths, str);
+		invalid_pathname(paths, command, argv[3]);
 	dup2(fd[0], 0);
 	dup2(fd_outfile, 1);
 	close(fd[0]);
 	close(fd[1]);
 	close(fd_outfile);
-	if (execve(pathname, str, envp) == -1)
-		execve_error(pathname, paths, str);
+	if (execve(pathname, command, envp) == -1)
+		execve_error(pathname, paths, command);
 }
 
 int	main(int argc, char *argv[], char *envp[])
@@ -72,8 +78,9 @@ int	main(int argc, char *argv[], char *envp[])
 	int		exit_status;
 	char	**paths;
 
+	check_args(argc);
 	paths = get_paths(envp);
-	if (argc != 5 || pipe(fd) == -1)
+	if (pipe(fd) == -1)
 		pipe_error(paths);
 	pid[0] = fork();
 	if (pid[0] < 0)

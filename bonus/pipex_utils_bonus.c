@@ -32,8 +32,8 @@ void	free_all(t_data *data)
 		free(data->pathname);
 	if (data->paths)
 		free_split(data->paths);
-	if (data->str)
-		free_split(data->str);
+	if (data->command)
+		free_split(data->command);
 	if (data->pid)
 		free(data->pid);
 	if (data)
@@ -42,6 +42,7 @@ void	free_all(t_data *data)
 
 void	get_data(t_data **data, int argc, char *envp[])
 {
+	check_args(argc);
 	(*data) = malloc(sizeof(t_data));
 	if (!*data)
 		return ;
@@ -61,30 +62,23 @@ void	get_data(t_data **data, int argc, char *envp[])
 	}
 }
 
-void	check_empty_string(char *argv[], t_data *data, int i)
+void	check_file1_and_empty_string(char *argv[], t_data *data, int i)
 {
 	int	fd;
 
 	fd = 0;
+	if (i == 0)
+	{
+		fd = open(argv[1], O_RDONLY);
+		if (fd == -1)
+			invalid_fd(argv[1], data);
+		close(fd);
+	}
 	if (ft_strlen(argv[i + 2]) == 0)
 	{
-		if (i == 0)
-		{
-			fd = open(argv[1], O_RDONLY);
-			if (fd == -1)
-				invalid_fd(argv[1], data);
-			close(fd);
-		}
-		if (i == data->num_cmds - 1)
-		{
-			fd = open(argv[i + 3], O_WRONLY | O_TRUNC | O_CREAT, 0644);
-			if (fd == -1)
-				invalid_fd(argv[i + 3], data);
-			close(fd);
-		}
 		close_pipes(data->fd);
 		free_all(data);
-		perror("zsh: permission denied");
-		exit(126);
+		ft_putstr_fd("bash: : command not found\n", 1);
+		exit(127);
 	}
 }
