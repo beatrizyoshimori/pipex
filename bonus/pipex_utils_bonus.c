@@ -43,11 +43,16 @@ void	free_all(t_data *data)
 void	get_data(t_data **data, int argc, char *envp[])
 {
 	check_args(argc);
-	(*data) = malloc(sizeof(t_data));
+	(*data) = (t_data *)malloc(sizeof(t_data));
 	if (!*data)
-		return ;
+	{
+		ft_putstr_fd("Could not allocate data.\n", 1);
+		exit(1);
+	}
+	(*data)->command = NULL;
+	(*data)->pathname = NULL;
 	(*data)->num_cmds = argc - 3;
-	(*data)->pid = malloc(sizeof(int) * (*data)->num_cmds);
+	(*data)->pid = (pid_t *)malloc(sizeof(int) * (*data)->num_cmds);
 	if (!(*data)->pid)
 	{
 		free(*data);

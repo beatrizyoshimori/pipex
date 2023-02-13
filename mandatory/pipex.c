@@ -12,89 +12,79 @@
 
 #include "pipex.h"
 
-void	first_cmd(char *argv[], char **paths, int fd[], char *envp[])
+void	make_command(t_data *data, char *argv, int fd)
+{
+	check_empty_string(argv, data, fd);
+	data->command = get_commands(argv);
+	if (access(argv, F_OK) == 0)
+	{
+		check_execution_permission(argv);
+		data->pathname = ft_strdup(argv);
+	}
+	else
+		data->pathname = get_pathname(data->paths, data->command);
+	if (!data->pathname)
+		invalid_pathname(data, argv);
+}
+
+void	first_cmd(char *argv[], char *envp[], t_data *data)
 {
 	int		fd_infile;
-	char	**command;
-	char	*pathname;
 
 	fd_infile = open(argv[1], O_RDONLY);
 	if (fd_infile == -1)
-		invalid_fd(argv[1], paths);
-	check_empty_string(argv[2], paths, fd_infile);
-	command = get_commands(argv[2]);
-	if (access(argv[2], F_OK) == 0)
-	{
-		check_execution_permission(argv[2]);
-		pathname = ft_strdup(argv[2]);
-	}
-	else
-		pathname = get_pathname(paths, command);
-	if (!pathname)
-		invalid_pathname(paths, command, argv[2]);
+		invalid_fd(argv[1], data);
+	make_command(data, argv[2], fd_infile);
+	close(data->fd[0]);
 	dup2(fd_infile, 0);
-	dup2(fd[1], 1);
-	close(fd[0]);
-	close(fd[1]);
+	dup2(data->fd[1], 1);
+	close(data->fd[1]);
 	close(fd_infile);
-	if (execve(pathname, command, envp) == -1)
-		execve_error(pathname, paths, command);
+	if (execve(data->pathname, data->command, envp) == -1)
+		execve_error(data->pathname, data->paths, data->command);
 }
 
-void	second_cmd(char *argv[], char **paths, int fd[], char *envp[])
+void	second_cmd(char *argv[], char *envp[], t_data *data)
 {
 	int		fd_outfile;
-	char	**command;
-	char	*pathname;
 
 	fd_outfile = open(argv[4], O_WRONLY | O_TRUNC | O_CREAT, 0644);
 	if (fd_outfile == -1)
-		invalid_fd(argv[4], paths);
-	check_empty_string(argv[3], paths, fd_outfile);
-	command = get_commands(argv[3]);
-	if (access(argv[3], F_OK) == 0)
-	{
-		check_execution_permission(argv[3]);
-		pathname = ft_strdup(argv[3]);
-	}
-	else
-		pathname = get_pathname(paths, command);
-	if (!pathname)
-		invalid_pathname(paths, command, argv[3]);
-	dup2(fd[0], 0);
+		invalid_fd(argv[4], data);
+	make_command(data, argv[3], fd_outfile);
+	close(data->fd[1]);
+	dup2(data->fd[0], 0);
 	dup2(fd_outfile, 1);
-	close(fd[0]);
-	close(fd[1]);
+	close(data->fd[0]);
 	close(fd_outfile);
-	if (execve(pathname, command, envp) == -1)
-		execve_error(pathname, paths, command);
+	if (execve(data->pathname, data->command, envp) == -1)
+		execve_error(data->pathname, data->paths, data->command);
 }
 
 int	main(int argc, char *argv[], char *envp[])
 {
-	int		fd[2];
-	pid_t	pid[2];
-	int		status;
 	int		exit_status;
-	char	**paths;
+	t_data	*data;
 
 	check_args(argc);
-	paths = get_paths(envp);
-	if (pipe(fd) == -1)
-		pipe_error(paths);
-	pid[0] = fork();
-	if (pid[0] < 0)
-		fork_error(fd, paths);
-	else if (pid[0] == 0)
-		first_cmd(argv, paths, fd, envp);
-	pid[1] = fork();
-	if (pid[1] < 0)
-		fork_error(fd, paths);
-	if (pid[1] == 0)
-		second_cmd(argv, paths, fd, envp);
-	close_pipe_free_paths(fd, paths);
-	waitpid(pid[0], &status, 0);
-	waitpid(pid[1], &status, 0);
-	exit_status = WEXITSTATUS(status);
+	get_data(&data, envp);
+	if (pipe(data->fd) == -1)
+		pipe_error(data->paths);
+	data->pid[0] = fork();
+	if (data->pid[0] < 0)
+		fork_error(data->fd, data->paths);
+	else if (data->pid[0] == 0)
+		first_cmd(argv, envp, data);
+	data->pid[1] = fork();
+	if (data->pid[1] < 0)
+		fork_error(data->fd, data->paths);
+	if (data->pid[1] == 0)
+		second_cmd(argv, envp, data);
+	close(data->fd[0]);
+	close(data->fd[1]);
+	waitpid(data->pid[0], &data->status, 0);
+	waitpid(data->pid[1], &data->status, 0);
+	exit_status = WEXITSTATUS(data->status);
+	free_all(data);
 	return (exit_status);
 }

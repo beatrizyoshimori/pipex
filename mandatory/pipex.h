@@ -21,21 +21,33 @@
 # include <fcntl.h>
 # include "../libft/libft.h"
 
-void	first_cmd(char *argv[], char **paths, int fd[], char *envp[]);
-void	second_cmd(char *argv[], char **paths, int fd[], char *envp[]);
+typedef struct s_data
+{
+	int		fd[2];
+	pid_t	pid[2];
+	char	**paths;
+	int		status;
+	char	*pathname;
+	char	**command;
+}	t_data;
+
+void	first_cmd(char *argv[], char *envp[], t_data *data);
+void	second_cmd(char *argv[], char *envp[], t_data *data);
 void	delete_quotes(char **split_str);
 char	**get_commands(char *str);
+void	make_command(t_data *data, char *argv, int fd);
 void	check_execution_permission(char *pathname);
 char	*get_pathname(char **paths, char **str);
 char	**get_paths(char *envp[]);
 void	free_split(char **str);
-void	close_pipe_free_paths(int fd[], char **paths);
-void	check_empty_string(char *argv, char **paths, int fd);
+void	free_all(t_data *data);
+void	get_data(t_data **data, char *envp[]);
+void	check_empty_string(char *argv, t_data *data, int fd);
 void	check_args(int argc);
-void	invalid_pathname(char **paths, char **str, char *cmd);
-void	invalid_fd(char *argv, char **paths);
-void	execve_error(char *pathname, char **paths, char **str);
-void	fork_error(int fd[2], char **paths);
-void	pipe_error(char **paths);
+void	invalid_pathname(t_data *data, char *cmd);
+void	invalid_fd(char *argv, t_data *data);
+void	execve_error(t_data *data);
+void	fork_error(t_data *data);
+void	pipe_error(t_data *data);
 
 #endif

@@ -26,20 +26,45 @@ void	free_split(char **str)
 	str = NULL;
 }
 
-void	close_pipe_free_paths(int fd[], char **paths)
+void	free_all(t_data *data)
 {
-	close(fd[0]);
-	close(fd[1]);
-	free_split(paths);
+	if (data->pathname)
+		free(data->pathname);
+	if (data->paths)
+		free_split(data->paths);
+	if (data->command)
+		free_split(data->command);
+	if (data)
+		free(data);
 }
 
-void	check_empty_string(char *argv, char **paths, int fd)
+void	get_data(t_data **data, char *envp[])
+{
+	(*data) = (t_data *)malloc(sizeof(t_data));
+	if (!*data)
+	{
+		ft_putstr_fd("Could not allocate data.\n", 1);
+		exit(1);
+	}
+	(*data)->command = NULL;
+	(*data)->pathname = NULL;
+	(*data)->paths = get_paths(envp);
+	if (!(*data)->paths)
+	{
+		free((*data));
+		exit(1);
+	}
+}
+
+void	check_empty_string(char *argv, t_data *data, int fd)
 {
 	if (ft_strlen(argv) == 0)
 	{
 		ft_putstr_fd("bash: : command not found\n", 1);
-		free_split(paths);
+		close(data->fd[0]);
+		close(data->fd[1]);
 		close(fd);
+		free_all(data);
 		exit(127);
 	}
 }

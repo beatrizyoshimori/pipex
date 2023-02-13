@@ -12,44 +12,41 @@
 
 #include "pipex.h"
 
-void	invalid_pathname(char **paths, char **str, char *cmd)
+void	invalid_pathname(t_data *data, char *cmd)
 {
 	ft_putstr_fd("bash: ", 1);
 	ft_putstr_fd(cmd, 1);
 	ft_putstr_fd(": command not found\n", 1);
-	free_split(paths);
-	free_split(str);
+	free_all(data);
 	exit(127);
 }
 
-void	invalid_fd(char *argv, char **paths)
+void	invalid_fd(char *argv, t_data *data)
 {
 	ft_putstr_fd("bash: ", 1);
 	perror(argv);
-	free_split(paths);
+	free_all(data);
 	exit(1);
 }
 
-void	execve_error(char *pathname, char **paths, char **str)
+void	execve_error(t_data *data)
 {
-	free_split(str);
-	free_split(paths);
-	free(pathname);
+	free_all(data);
 	exit(1);
 }
 
-void	fork_error(int fd[2], char **paths)
+void	fork_error(t_data *data)
 {
 	ft_putstr_fd("Fork error.\n", 1);
-	close(fd[0]);
-	close(fd[1]);
-	free_split(paths);
+	close(data->fd[0]);
+	close(data->fd[1]);
+	free_all(data);
 	exit(1);
 }
 
-void	pipe_error(char **paths)
+void	pipe_error(t_data *data)
 {
 	ft_putstr_fd("Pipe error.\n", 1);
-	free_split(paths);
+	free_all(data);
 	exit(1);
 }
