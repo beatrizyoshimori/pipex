@@ -41,7 +41,7 @@ void	first_cmd(char *argv[], char *envp[], t_data *data)
 	close(data->fd[1]);
 	close(fd_infile);
 	if (execve(data->pathname, data->command, envp) == -1)
-		execve_error(data->pathname, data->paths, data->command);
+		execve_error(data);
 }
 
 void	second_cmd(char *argv[], char *envp[], t_data *data)
@@ -58,7 +58,7 @@ void	second_cmd(char *argv[], char *envp[], t_data *data)
 	close(data->fd[0]);
 	close(fd_outfile);
 	if (execve(data->pathname, data->command, envp) == -1)
-		execve_error(data->pathname, data->paths, data->command);
+		execve_error(data);
 }
 
 int	main(int argc, char *argv[], char *envp[])
@@ -69,15 +69,15 @@ int	main(int argc, char *argv[], char *envp[])
 	check_args(argc);
 	get_data(&data, envp);
 	if (pipe(data->fd) == -1)
-		pipe_error(data->paths);
+		pipe_error(data);
 	data->pid[0] = fork();
 	if (data->pid[0] < 0)
-		fork_error(data->fd, data->paths);
+		fork_error(data);
 	else if (data->pid[0] == 0)
 		first_cmd(argv, envp, data);
 	data->pid[1] = fork();
 	if (data->pid[1] < 0)
-		fork_error(data->fd, data->paths);
+		fork_error(data);
 	if (data->pid[1] == 0)
 		second_cmd(argv, envp, data);
 	close(data->fd[0]);

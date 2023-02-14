@@ -16,7 +16,6 @@
 # include <stdio.h>
 # include <unistd.h>
 # include <sys/wait.h>
-# include <string.h>
 # include <stdlib.h>
 # include <fcntl.h>
 # include "../libft/libft.h"
@@ -31,11 +30,11 @@ typedef struct s_data
 	char	**command;
 }	t_data;
 
+void	make_command(t_data *data, char *argv, int fd);
 void	first_cmd(char *argv[], char *envp[], t_data *data);
 void	second_cmd(char *argv[], char *envp[], t_data *data);
 void	delete_quotes(char **split_str);
 char	**get_commands(char *str);
-void	make_command(t_data *data, char *argv, int fd);
 void	check_execution_permission(char *pathname);
 char	*get_pathname(char **paths, char **str);
 char	**get_paths(char *envp[]);
