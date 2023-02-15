@@ -6,7 +6,7 @@
 /*   By: byoshimo <byoshimo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/13 19:55:13 by byoshimo          #+#    #+#             */
-/*   Updated: 2023/02/04 16:28:47 by byoshimo         ###   ########.fr       */
+/*   Updated: 2023/02/14 20:14:43 by byoshimo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,14 +56,13 @@ void	get_data(t_data **data, char *envp[])
 	}
 }
 
-void	check_empty_string(char *argv, t_data *data, int fd)
+void	check_empty_string(char *argv, t_data *data)
 {
 	if (ft_strlen(argv) == 0)
 	{
-		ft_putstr_fd("bash: : command not found\n", 1);
+		ft_putstr_fd("Error: : command not found\n", 1);
 		close(data->fd[0]);
 		close(data->fd[1]);
-		close(fd);
 		free_all(data);
 		exit(127);
 	}

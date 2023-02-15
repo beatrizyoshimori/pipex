@@ -6,23 +6,23 @@
 /*   By: byoshimo <byoshimo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/28 19:17:05 by byoshimo          #+#    #+#             */
-/*   Updated: 2023/02/04 17:10:51 by byoshimo         ###   ########.fr       */
+/*   Updated: 2023/02/14 21:19:07 by byoshimo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
 
-void	make_command(t_data *data, char *argv, int fd)
+void	make_command(t_data *data, char *argv)
 {
-	check_empty_string(argv, data, fd);
+	check_empty_string(argv, data);
 	data->command = get_commands(argv);
 	if (access(argv, F_OK) == 0)
 	{
-		check_execution_permission(argv);
+		check_execution_permission(argv, data);
 		data->pathname = ft_strdup(argv);
 	}
 	else
-		data->pathname = get_pathname(data->paths, data->command);
+		data->pathname = get_pathname(data);
 	if (!data->pathname)
 		invalid_pathname(data, argv);
 }
@@ -31,10 +31,10 @@ void	first_cmd(char *argv[], char *envp[], t_data *data)
 {
 	int		fd_infile;
 
+	make_command(data, argv[2]);
 	fd_infile = open(argv[1], O_RDONLY);
 	if (fd_infile == -1)
 		invalid_fd(argv[1], data);
-	make_command(data, argv[2], fd_infile);
 	close(data->fd[0]);
 	dup2(fd_infile, 0);
 	dup2(data->fd[1], 1);
@@ -48,10 +48,10 @@ void	second_cmd(char *argv[], char *envp[], t_data *data)
 {
 	int		fd_outfile;
 
+	make_command(data, argv[3]);
 	fd_outfile = open(argv[4], O_WRONLY | O_TRUNC | O_CREAT, 0644);
 	if (fd_outfile == -1)
 		invalid_fd(argv[4], data);
-	make_command(data, argv[3], fd_outfile);
 	close(data->fd[1]);
 	dup2(data->fd[0], 0);
 	dup2(fd_outfile, 1);

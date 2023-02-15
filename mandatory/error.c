@@ -6,7 +6,7 @@
 /*   By: byoshimo <byoshimo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/25 19:00:45 by byoshimo          #+#    #+#             */
-/*   Updated: 2023/02/04 14:51:54 by byoshimo         ###   ########.fr       */
+/*   Updated: 2023/02/14 20:15:06 by byoshimo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 void	invalid_pathname(t_data *data, char *cmd)
 {
-	ft_putstr_fd("bash: ", 1);
+	ft_putstr_fd("Error: ", 1);
 	ft_putstr_fd(cmd, 1);
 	ft_putstr_fd(": command not found\n", 1);
 	close(data->fd[0]);
@@ -25,7 +25,7 @@ void	invalid_pathname(t_data *data, char *cmd)
 
 void	invalid_fd(char *argv, t_data *data)
 {
-	ft_putstr_fd("bash: ", 1);
+	ft_putstr_fd("Error: ", 1);
 	perror(argv);
 	close(data->fd[0]);
 	close(data->fd[1]);
