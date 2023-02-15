@@ -6,7 +6,7 @@
 /*   By: byoshimo <byoshimo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/13 19:50:49 by byoshimo          #+#    #+#             */
-/*   Updated: 2023/02/14 18:56:02 by byoshimo         ###   ########.fr       */
+/*   Updated: 2023/02/15 20:37:14 by byoshimo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,10 +35,11 @@ void	first_cmd(char *argv[], t_data *data);
 void	last_cmd(char *argv[], t_data *data, int i);
 void	middle_cmd(t_data *data, int i);
 void	child_process(char *argv[], char *envp[], t_data *data, int i);
-void	delete_quotes(char **split_str);
+char	*remove_quotes(char *dst, char *src);
+void	check_quotes(char **split_str);
 char	**get_commands(char *str);
 void	check_execution_permission(char *pathname, t_data *data);
-char	*get_pathname(t_data *data);
+void	get_pathname(t_data *data);
 char	**get_paths(char *envp[]);
 void	free_split(char **str);
 void	free_all(t_data *data);

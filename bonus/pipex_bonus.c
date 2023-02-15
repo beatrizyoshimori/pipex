@@ -6,7 +6,7 @@
 /*   By: byoshimo <byoshimo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/28 19:17:05 by byoshimo          #+#    #+#             */
-/*   Updated: 2023/02/14 19:05:16 by byoshimo         ###   ########.fr       */
+/*   Updated: 2023/02/15 20:38:11 by byoshimo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,7 +65,7 @@ void	child_process(char *argv[], char *envp[], t_data *data, int i)
 		data->pathname = ft_strdup(argv[i + 2]);
 	}
 	else
-		data->pathname = get_pathname(data);
+		get_pathname(data);
 	if (!data->pathname)
 		invalid_pathname(data, argv[i + 2]);
 	if (i == 0)

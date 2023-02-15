@@ -6,7 +6,7 @@
 /*   By: byoshimo <byoshimo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/13 19:49:17 by byoshimo          #+#    #+#             */
-/*   Updated: 2023/02/14 20:48:53 by byoshimo         ###   ########.fr       */
+/*   Updated: 2023/02/15 20:30:12 by byoshimo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,35 +18,34 @@ void	check_execution_permission(char *pathname, t_data *data)
 	{
 		close(data->fd[0]);
 		close(data->fd[1]);
-		free_all(data);
 		perror(pathname);
+		free_all(data);
 		exit(126);
 	}
 }
 
-char	*get_pathname(t_data *data)
+void	get_pathname(t_data *data)
 {
 	int		i;
 	char	*tmp;
-	char	*pathname;
 
 	i = 0;
 	while (data->paths[i])
 	{
 		tmp = ft_strjoin(data->paths[i], "/");
-		pathname = ft_strjoin(tmp, data->command[0]);
+		data->pathname = ft_strjoin(tmp, data->command[0]);
 		if (tmp)
 			free(tmp);
-		if (access(pathname, F_OK) == 0)
+		if (access(data->pathname, F_OK) == 0)
 		{
-			check_execution_permission(pathname, data);
-			return (pathname);
+			check_execution_permission(data->pathname, data);
+			return ;
 		}
-		if (pathname)
-			free(pathname);
+		if (data->pathname)
+			free(data->pathname);
 		i++;
 	}
-	return (NULL);
+	data->pathname = NULL;
 }
 
 char	**get_paths(char *envp[])

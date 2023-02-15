@@ -6,7 +6,7 @@
 /*   By: byoshimo <byoshimo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/28 19:17:05 by byoshimo          #+#    #+#             */
-/*   Updated: 2023/02/14 21:19:07 by byoshimo         ###   ########.fr       */
+/*   Updated: 2023/02/15 20:20:59 by byoshimo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@ void	make_command(t_data *data, char *argv)
 		data->pathname = ft_strdup(argv);
 	}
 	else
-		data->pathname = get_pathname(data);
+		get_pathname(data);
 	if (!data->pathname)
 		invalid_pathname(data, argv);
 }
